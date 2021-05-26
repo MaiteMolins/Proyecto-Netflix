@@ -19,7 +19,7 @@ if (!require("readr")) {
 
 #### Importación del conjunto de datos ####
 
-setwd("C:/1r MEI/BIA/Practica02/netflix_titles.csv")
+#setwd("C:/1r MEI/BIA/Practica02/netflix_titles.csv")
 #Session -> Set working directory -> To source file location
 
 NETFLIX <- read_csv("netflix_titles.csv")
@@ -33,7 +33,12 @@ NETFLIX <- read_csv("netflix_titles.csv")
 #head(NETFLIX)
 #str(NETFLIX)
 netflix<-NETFLIX
-netflix$year_added<-as.numeric(substr(netflix$date_added, nchar(netflix$date_added)-4, nchar(netflix$date_added)))
+netflix=distinct(netflix,title,country,type,release_year, .keep_all = TRUE)
+
+netflix$rating <- as.factor(netflix$rating)
+netflix$date_added <- mdy(netflix$date_added)
+
+netflix$year_added<-format(netflix$date_added, "%Y")
 
 table(netflix$type)
 table(netflix$year_added)
@@ -82,3 +87,5 @@ netflixSeries<-netflix[netflix$type=="TV Show",]
 netflixSeries$duration<-gsub(" Season", "", netflixSeries$duration, fixed=TRUE)
 netflixSeries$duration<-as.numeric(gsub("s", "", netflixSeries$duration, fixed=TRUE))
 summary(netflixSeries$duration)
+
+ggplot(netflix,aes(x=type))+geom_bar(col="black",fill="red")
