@@ -79,8 +79,6 @@ netflixMovies$duration<-as.numeric(gsub(" min", "", netflixMovies$duration, fixe
 summary(netflixMovies$duration)
 
 netflixSeries<-netflix[netflix$type=="TV Show",]
-netflixSeries$duration<-as.numeric(gsub(c(" Season"~" Seasons"), "", netflixSeries$duration, fixed=TRUE))
+netflixSeries$duration<-gsub(" Season", "", netflixSeries$duration, fixed=TRUE)
+netflixSeries$duration<-as.numeric(gsub("s", "", netflixSeries$duration, fixed=TRUE))
 summary(netflixSeries$duration)
-
-
-#guyfygklhh
