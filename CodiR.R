@@ -17,9 +17,22 @@ if (!require("readr")) {
   library(readr)
 }
 
+if(!require("tm")) {
+  install.packages("tm")
+  library("tm")
+}
+if(!require("wordcloud")) {
+  install.packages("wordcloud")
+  library("wordcloud")
+}
+
 if(!require("RColorBrewer")) {
   install.packages("RColorBrewer")
   library("RColorBrewer")
+}
+if(!require("SnowballC")) {
+  install.packages("SnowballC")
+  library("SnowballC")
 }
 #### Importación del conjunto de datos ####
 
@@ -185,3 +198,44 @@ ggplot(netflixByCat) + geom_col(aes(x=listed_in,y=count, fill=factor(listed_in))
   ggtitle("Top 20 Genres on Netflix") + 
   theme(legend.position = "none")  
               
+#### Feelings Analysis - Title ####
+
+docs <- Corpus(VectorSource(netflix$title))
+
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, removeWords, stopwords(kind = "en"))
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, stripWhitespace)
+
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+windows()
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=100, random.order=F, scale=c(4,0.25),
+          colors=brewer.pal(8, "Dark2"))
+
+#### Feelings Analysis - Description ####
+
+docs <- Corpus(VectorSource(netflix$description))
+
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, removeWords, stopwords(kind = "en"))
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, stripWhitespace)
+docs <- tm_map(docs,
+
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+
+windows()
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=100, random.order=F, scale=c(4,0.25),
+          colors=brewer.pal(8, "Dark2"))
+
