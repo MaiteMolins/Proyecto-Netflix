@@ -130,3 +130,47 @@ ggplot(netflixByDate, aes(YearAdded, count, group=Type))+
 
 ####Content by Rating####
 
+netflixByRating<-netflix$show_id %>% group_by(netflix$rating) %>% summarize(count=n()) %>% na.omit()
+colnames(netflixByRating)<-c("Rating","count")
+ggplot(netflixByRating, aes(x=Rating, y=count, group=1, fill=-count)) + geom_col() +
+  xlab("Rating") + 
+  ylab("Number of Content")+
+  ggtitle("Amount of Netflix Content By Rating")+
+  theme_classic() + 
+  theme(legend.position = "none")
+
+
+netflixByRating2<-netflix$show_id %>% group_by(netflix$rating,netflix$type) %>% summarize(count=n()) %>% na.omit()
+colnames(netflixByRating2)<-c("Rating","Type", "count")
+netflixByRating2<-reshape(data=data.frame(netflixByRating2),idvar="Rating",
+                          v.names= "count",
+                          timevar="Type", 
+                          direction="wide")
+netflixByRating2[is.na(netflixByRating2)]<-0
+colnames(netflixByRating2)<-c("Rating","Movie", "TV_Show")
+netflixByRating2$Total<-netflixByRating2$Movie + netflixByRating2$TV_Show
+ggplot(netflixByRating2) + geom_col(aes(x=Rating, y=Total, group=1,fill="pink")) + 
+  geom_col(aes(x=Rating, y=Movie, group=1,fill="plum3")) +
+  xlab("Rating") + 
+  ylab("Number of Content")+
+  ggtitle("Amount of Netflix Content By Rating and Type")+
+  theme_classic() +
+  scale_fill_manual(name=element_blank(),values= (c("pink","plum3")), labels=c("TV Shows", "Movies")) +
+  theme(legend.position = "right")
+
+ggplot(netflixByRating2) + geom_tile(aes(x=Movie,y=Rating,group=1,fill=Total)) 
+     
+
+#### Top 20 Genres on Netflix ####
+netflixByCat<- netflixCat %>% group_by(listed_in) %>% summarize(count=n()) %>% na.omit() %>% 
+  arrange(desc(count))
+
+netflixByCat<-netflixByCat[netflixByCat$count>=netflixByCat$count[20],]  
+
+ggplot(netflixByCat) + geom_col(aes(x=listed_in,y=count, fill=factor(listed_in))) +
+  theme_classic() + theme(axis.text.x = element_text(angle=90)) +
+  xlab("Genre") + 
+  ylab("Number of Content")+
+  ggtitle("Top 20 Genres on Netflix") + 
+  theme(legend.position = "none")  
+              
