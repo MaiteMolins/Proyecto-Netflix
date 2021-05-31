@@ -129,7 +129,15 @@ ggplot(netflixByCountryArr, aes(NumberOfMovies, NumberOfTVShows, colour=country)
   xlab("Number of Movies") + ylab("Number of TV Shows")+
   ggtitle("Amount of Netflix Content in Top 10 countries")+theme_classic()+
   labs(col="Country")
-rm(netflixByCountryArr)
+ggplot(netflixByCountryArr) +geom_col(aes(x=country,y=total/total*100, group=1, fill="pink")) + 
+          geom_col(aes(x=country, y=NumberOfMovies/total*100, group=1,fill="plum3")) + 
+          coord_flip() + 
+          xlab("Country") + 
+          ylab("%")+
+          ggtitle("Top 20 Countries with Netflix") + 
+          scale_fill_manual(name=element_blank(),values= (c("pink","plum3")), labels=c("TV Shows", "Movies")) +
+          theme_classic() + 
+           theme(legend.position = "right")
 
 ####Content by Date####
 netflix$show_id<-tibble(netflix$show_id)
@@ -219,15 +227,14 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
           colors=brewer.pal(8, "Dark2"))
 
 #### Feelings Analysis - Description ####
-
 docs <- Corpus(VectorSource(netflix$description))
 
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeNumbers)
-docs <- tm_map(docs, removeWords, stopwords(kind = "en"))
+docs <- tm_map(docs, removeWords,stopwords(kind = "en"))
 docs <- tm_map(docs, removePunctuation)
 docs <- tm_map(docs, stripWhitespace)
-docs <- tm_map(docs,
+
 
 dtm <- TermDocumentMatrix(docs)
 m <- as.matrix(dtm)
@@ -238,4 +245,5 @@ windows()
 wordcloud(words = d$word, freq = d$freq, min.freq = 1,
           max.words=100, random.order=F, scale=c(4,0.25),
           colors=brewer.pal(8, "Dark2"))
+
 
