@@ -17,6 +17,10 @@ if (!require("readr")) {
   library(readr)
 }
 
+if(!require("RColorBrewer")) {
+  install.packages("RColorBrewer")
+  library("RColorBrewer")
+}
 #### Importación del conjunto de datos ####
 
 #setwd("C:/1r MEI/BIA/Practica02/netflix_titles.csv")
@@ -158,8 +162,15 @@ ggplot(netflixByRating2) + geom_col(aes(x=Rating, y=Total, group=1,fill="pink"))
   scale_fill_manual(name=element_blank(),values= (c("pink","plum3")), labels=c("TV Shows", "Movies")) +
   theme(legend.position = "right")
 
-ggplot(netflixByRating2) + geom_tile(aes(x=Movie,y=Rating,group=1,fill=Total)) 
-     
+netflixByRating3<-netflix$show_id %>% group_by(netflix$rating,netflix$type) %>% summarize(count=n()) %>% na.omit()
+colnames(netflixByRating3)<-c("Rating","Type", "count")
+ggplot(netflixByRating3) + geom_tile(aes(x=Type,y=Rating,fill=count)) +
+  xlab("Type") + 
+  ylab("Rating")+
+  ggtitle("Amount of Netflix Content By Rating and Type")+
+  scale_fill_gradientn(colours = colorRampPalette(brewer.pal(5, 'RdPu'), space='Lab')(100)) +
+  theme_classic() 
+ 
 
 #### Top 20 Genres on Netflix ####
 netflixByCat<- netflixCat %>% group_by(listed_in) %>% summarize(count=n()) %>% na.omit() %>% 
