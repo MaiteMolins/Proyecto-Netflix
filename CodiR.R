@@ -34,6 +34,14 @@ if(!require("SnowballC")) {
   install.packages("SnowballC")
   library("SnowballC")
 }
+if(!require("tidytext")) {
+  install.packages("tidytext")
+  library("tidytext")
+}
+if(!require("textdata")) {
+  install.packages("textdata")
+  library("textdata")
+}
 #### Importación del conjunto de datos ####
 
 #setwd("C:/1r MEI/BIA/Practica02/netflix_titles.csv")
@@ -246,4 +254,30 @@ wordcloud(words = d$word, freq = d$freq, min.freq = 1,
           max.words=100, random.order=F, scale=c(4,0.25),
           colors=brewer.pal(8, "Dark2"))
 
+#### Feelings' Analysis ####
 
+#afinn <- read.csv("lexico_afinn.en.es.csv", stringsAsFactors = F, fileEncoding = "latin1") %>% 
+  #tbl_df()
+
+nrc<-get_sentiments(lexicon = "nrc")
+
+netflix_nrc <- 
+  netflix %>%
+  unnest_tokens(input = "description", output = "word") 
+
+netflix_nrc <- 
+  netflix %>%
+  unnest_tokens(input = "description", output = "word") %>%
+  inner_join(nrc, ., by = "word") 
+  #mutate(Tipo = ifelse(Puntuacion > 0, "Positiva", "Negativa")) 
+
+
+netflix_sentimientos <-
+  netflix_nrc %>%
+  group_by(show_id) %>%
+  summarise(sentimientos_descripcion= sentiment) %>%
+  left_join(netflix, ., by = "show_id")
+
+table(netflix_sentimientos$sentimientos_descripcion)   
+
+ggplot(netflix_sentimientos,aes(x=sentimientos_descripcion)) + geom_bar() 
